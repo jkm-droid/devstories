@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+{% include 'includes/navbar.html' %}
+
+      <div class="container mt-4 mb-4 text-center">
+          {% if rooms %}
+              <h3 class="text-info text-center">Select a chat room</h3>
+              {% for room in rooms %}
+                  <div class="badge badge-secondary chatroom">
+                      <a class="font-weight-bold" href="{{ room.absolute_url }}"><h4>{{ room.title }}</h4></a>
+                  </div>
+              {% endfor %}
+
+          {% else %}
+              <span class="alert alert-warning">No chat rooms available</span>
+          {% endif %}
+
+      </div>
+
+{% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/darkmode.js' %}"></script>
+{% endblock %}

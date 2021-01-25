@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+{% include 'includes/navbar.html' %}
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+    <div class="container-fluid h-100 mt-4 mb-4">
+			<div class="row justify-content-center h-100">
+               <!--- <div class="col-md-4 col-xl-3 chat">
+                    <div class="card mb-sm-3 mb-md-0 contacts_card">
+					<div class="card-header">
+						<div class="input-group">
+							<input type="text" placeholder="Search..." name="" class="form-control search">
+							<div class="input-group-prepend">
+								<span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+							</div>
+						</div>
+					</div>
+					<div class="card-body contacts_body">
+						<ui class="contacts">
+						<li class="active">
+							<div class="d-flex bd-highlight">
+								<div class="img_cont">
+									<img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+									<span class="online_icon"></span>
+								</div>
+								<div class="user_info">
+									<span>Khalid</span>
+									<p>Kalid is online</p>
+								</div>
+							</div>
+						</li>
+						<li>
+
+						</ui>
+					</div>
+					<div class="card-footer"></div>
+				</div></div>--->
+				<div class="col-md-8 col-xl-6 chat">
+					<div class="container card">
+						<div class="card-header msg_head">
+							<div class="d-flex bd-highlight">
+								<div class="img_cont">
+									<img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+									<span class="online_icon"></span>
+								</div>
+								<div class="user_info">
+									<span>Chat with Khalid</span>
+									<p>1767 Messages</p>
+								</div>
+								<div class="video_cam">
+									<span><i class="fas fa-video"></i></span>
+									<span><i class="fas fa-phone"></i></span>
+								</div>
+							</div>
+							<span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
+							<div class="action_menu">
+								<ul>
+									<li><i class="fas fa-user-circle"></i> View profile</li>
+									<li><i class="fas fa-users"></i> Add to close friends</li>
+									<li><i class="fas fa-plus"></i> Add to group</li>
+									<li><i class="fas fa-ban"></i> Block</li>
+								</ul>
+							</div>
+						</div>
+						<div class="card-body msg_card_body" id="chat-log">
+
+                            <div class="d-flex justify-content-start mb-4">
+                                <div class="img_cont_msg">
+                                    <img src="{% static 'images/lake.jpg' %}" class="rounded-circle user_img_msg" alt="">
+                                </div>
+                                <div class="msg_cotainer">
+                                    Hi, how are you samim?
+                                    <span class="msg_time">8:40 AM, Today</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end mb-4">
+                                <div class="msg_cotainer_send">
+                                    Hi Khalid i am good tnx how about you?
+                                    <span class="msg_time_send">8:55 AM, Today</span>
+                                </div>
+                                <div class="img_cont_msg">
+                                    <img src="{% static 'images/profile-avatar.jpg' %}" class="rounded-circle user_img_msg" alt="">
+                                </div>
+
+                            </div>
+                        </div>
+
+						<div class="card-footer">
+							<div class="input-group">
+								<div class="input-group-append">
+									<span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
+								</div>
+								<textarea id="chat-message-input" name="" class="form-control type_msg" placeholder="Type your message..."></textarea>
+								<div class="input-group-append">
+									<span id="chat-message-submit" class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+{{ room_name|json_script:"room-name" }}
+{% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/chat.js' %}"></script>
+    <script src="{% static 'js/darkmode.js' %}"></script>
+    <script src="{% static 'js/reconnecting-websocket.js' %}"></script>
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const messageInput = document.getElementById('chat-message-input');
+        const messageButton = document.getElementById('chat-message-submit');
+        var username = {{ username }};
+
+        const chatSocket = new ReconnectingWebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onopen = function(e){
+            fetchMessages();
+        };
+
+        function fetchMessages(){
+            chatSocket.send(JSON.stringify({'command': 'fetch_messages'}));
+        }
+
+        function createMessage(data){
+            var author = data['author'];
+            var messageListTag = document.createElement('li');
+            var imageTag = document.createElement('img');
+            var passageTag = document.createElement('p');
+            passageTag.textContent = data.content;
+            imageTag.src = '{% static 'images/profile-avatar.jpg' %}';
+            if(author === username){
+                $('<li class="replies "><img style="width:10px; height:10px;" src="{% static 'images/lake.jpg' %}" alt="" />').appendTo($('.img_cont_msg img'));
+                $('<p class="msg_cotainer_send col-md-4 offset-md-8 d-flex mb-4" style="color:blue;">' + data.content + '</p></li>').appendTo($('#chat-log'));
+            }else{
+                $('<li class="sent"><img style="width:10px; height:10px;" src="{% static 'images/lake.jpg' %}" alt="" />').appendTo($('.img_cont_msg img'));
+                $('<p class="msg_cotainer col-md-5 d-flex justify-content-start mb-4" style="color:white;">' + data.content + '</p></li>').appendTo($('#chat-log'));
+            }
+
+            //messageListTag.appendChild(imageTag);
+            //messageListTag.appendChild(passageTag);
+            //document.querySelector('#chat-log').appendChild(messageListTag);
+        }
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data['command'] === 'messages'){
+                for (let i=0; i < data['messages'].length; i++){
+                    createMessage(data['messages'][i]);
+                }
+            }else if(data['command'] === 'new_message'){
+                createMessage(data['message']);
+            }
+
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            if(message === ''){
+                notifier.show('Error', 'Please enter message', '', '{% static 'notifier/img/high_priority-48.png' %}', 4000);
+            }else {
+
+                chatSocket.send(JSON.stringify({
+                    'command': 'new_message',
+                    'message': message,
+                    'from': username
+                }));
+                console.log(message);
+                console.log(username);
+                messageInputDom.value = '';
+            }
+        };
+
+        messageInput.addEventListener('input', function () {
+            messageButton.disabled = (this.value === '');
+        })
+    </script>
+{% endblock %}

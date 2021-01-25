@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+{% include 'includes/navbar.html' %}
+    <div class="container mt-2">
+    {% if messages %}
+        {% for msg in messages %}
+            {{ msg }}
+        {% endfor %}
+
+    {% endif %}
+    {% if results %}
+        <h3 class="text-center">Search results for "{{ query }}"</h3>
+        {% for result in results %}
+            <div class="container col-md-8 justify-content-center rounded lavender">
+                <a class="mt-2" href="{{ result.get_absolute_url }}">
+                    <h3>{{ result.title }}</h3>
+                </a>
+                <p class="text-info mb-2">Published: {{ result.created_on }} <small>10 mins read</small></p>
+            </div><br>
+        {% endfor %}
+
+    {% else %}
+        <div class="rounded alert-info">
+            <h3 class="text-center" style="margin-top: 20%; margin-bottom: 20%;">No results found for "{{ query }}"</h3>
+        </div>
+    {% endif %}
+    </div>
+{% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+<script src="{% static 'js/darkmode.js' %}"></script>
+
+{% endblock %}

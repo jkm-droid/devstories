@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+{% include 'includes/navbar.html' %}
+    <div class="container mt-2">
+
+        <div class="container col-md-8">
+        {% if posts %}
+            <br>
+            <div class="">
+            <div class="row">
+                <div class="col-md-6 bg-info">
+                    <a href="{% url 'dashboard' %}"><h4 class="text-center text-secondary">{% if number_of_posts %} {{ number_of_posts }} {% endif %} Post(s)</h4></a>
+                </div>
+                <div class="container col-md-6 bg-warning">
+                    <a href="{% url 'draftedstories' %}"><h4 class="text-center text-secondary">{% if number_of_drafts %}{{ number_of_drafts }}{% endif %} Draft(s)</h4></a>
+                </div>
+            </div>
+            </div>
+            <br>
+            <h4 class="text-center general-title">My Drafted Stories ({% if number_of_drafts %} {{ number_of_drafts }} {% endif %})</h4>
+        {% for post in posts %}
+            <div class="px-2 py-2 mb-2 rounded lavender">
+
+                <a style="text-decoration: none;" href="{{ post.get_absolute_url }}"><h3>{{ post.title }}</h3></a>
+                    <p>Published: {{ post.created_on }} Update: {{ post.modified_on }}</p>
+                {% for tag in post.tags.all %}
+                    <span class="badge badge-secondary"><a style="color: white;" href="{% url 'taggedstories' tag.slug %}">#{{ tag }}</a></span>
+                {% endfor %}
+                <br>
+                <div class="rounded-pill btn-group">
+
+                    <a href="{{ post.get_edit_absolute_url }}"><button type="submit" class="btn btn-sm btn-warning mr-2"><i class="fa fa-edit"></i></button></a>
+                    <a href="{{ post.get_delete_absolute_url }}"><button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button></a>
+
+                </div>
+            </div>
+        {% endfor %}
+        {% else %}
+            <br>
+            <div class="text-center text-info rounded alert-info outline-primary" >
+                <h2>You have 0 drafted stories. You can
+                    <a href="{% url 'writestory' %}">Write a new story <i class="fa fa-edit"></i> </a>
+                </h2>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+{% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+<script src="{% static 'js/darkmode.js' %}"></script>
+
+{% endblock %}

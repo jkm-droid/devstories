@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% load static %}
+    {% include 'includes/navbar.html' %}
+    <link rel="stylesheet" href="{% static 'css/chat-room.css' %}">
+    <div class="container mt-2 mb-4" id="frame">
+        <!----<div id="sidepanel">
+            <div id="profile">
+                <div class="wrap">
+                    <img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="online" alt="" />
+                    <p>Mike Ross</p>
+                    <i class="fa fa-chevron-down expand-button" aria-hidden="true"></i>
+                    <div id="status-options">
+                        <ul>
+                            <li id="status-online" class="active"><span class="status-circle"></span> <p>Online</p></li>
+                            <li id="status-away"><span class="status-circle"></span> <p>Away</p></li>
+                            <li id="status-busy"><span class="status-circle"></span> <p>Busy</p></li>
+                            <li id="status-offline"><span class="status-circle"></span> <p>Offline</p></li>
+                        </ul>
+                    </div>
+                    <div id="expanded">
+                        <label for="twitter"><i class="fa fa-facebook fa-fw" aria-hidden="true"></i></label>
+                        <input name="twitter" type="text" value="mikeross" />
+                        <label for="twitter"><i class="fa fa-twitter fa-fw" aria-hidden="true"></i></label>
+                        <input name="twitter" type="text" value="ross81" />
+                        <label for="twitter"><i class="fa fa-instagram fa-fw" aria-hidden="true"></i></label>
+                        <input name="twitter" type="text" value="mike.ross" />
+                    </div>
+                </div>
+            </div>
+            <div id="search">
+                <label for=""><i class="fa fa-search" aria-hidden="true"></i></label>
+                <input type="text" placeholder="Search contacts..." />
+            </div>
+            <div id="contacts">
+                <ul>
+                    <li class="contact">
+                        <div class="wrap">
+                            <span class="contact-status online"></span>
+                            <img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+                            <div class="meta">
+                                <p class="name">Louis Litt</p>
+                                <p class="preview">You just got LITT up, Mike.</p>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="contact active">
+                        <div class="wrap">
+                            <span class="contact-status busy"></span>
+                            <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+                            <div class="meta">
+                                <p class="name">Harvey Specter</p>
+                                <p class="preview">Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div id="bottom-bar">
+                <button id="addcontact"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Add contact</span></button>
+                <button id="settings"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Settings</span></button>
+            </div>
+        </div>--->
+        <div class="content mb-4">
+            <div class="contact-profile">
+                <img class="rounded-circle" src="{% static 'images/profile-avatar.jpg' %}" alt="" />
+                <p class="font-weight-bold">{{ room_title|capfirst }} chatroom</p>
+            </div><hr class="divider">
+            <div class="messages">
+                <ul id="chat-log">
+                    <li class="sent justify-context-start">
+
+                    </li>
+
+                    <li class="replies">
+
+                    </li>
+
+                </ul>
+            </div>
+            <div class="message-input">
+                <div class="wrap">
+                    <input id="chat-message-input" type="text" placeholder="Write your message..." />
+                    <i class="fa fa-paperclip attachment" aria-hidden="true"></i>
+                    <button disabled id="chat-message-submit" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ room_name|json_script:"room-name" }}
+    {% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/chat.js' %}"></script>
+    <script src="{% static 'js/darkmode.js' %}"></script>
+    <script src="{% static 'js/reconnecting-websocket.js' %}"></script>
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const messageInput = document.getElementById('chat-message-input');
+        const messageButton = document.getElementById('chat-message-submit');
+        var username = {{ username }};
+
+        var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const chatSocket = new ReconnectingWebSocket(
+            ws_scheme
+            +'://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onopen = function(e){
+            fetchMessages();
+        };
+
+        function fetchMessages(){
+            chatSocket.send(JSON.stringify({'command': 'fetch_messages'}));
+        }
+
+        function createMessage(data){
+            var author = data['author'];
+            var timestamp =  data.timestamp;
+            //console.log(timestamp);
+
+            var messageListTag = document.createElement('li');
+            var imageTag = document.createElement('img');
+            var passageTag = document.createElement('p');
+            var authorTag = document.createElement('div');
+            var timeTag = document.createElement('span');
+            //var messageTimeTag = document.createElement('div');
+
+            passageTag.textContent = data.content;
+            imageTag.src = '{% static 'images/profile-avatar.jpg' %}';
+            timeTag.textContent = timestamp;
+
+            //author is the sender, replying or sending message
+            //located on the right side
+            if(author === username){
+                messageListTag.className = 'replies';
+                //authorTag.textContent = "You";
+                authorTag.style.fontSize = "small";
+            }else{
+                messageListTag.className = 'sent';
+                authorTag.textContent = author;
+                authorTag.style.fontSize = "small";
+            }
+
+            messageListTag.appendChild(imageTag);
+            messageListTag.appendChild(authorTag);
+            messageListTag.appendChild(passageTag);
+            //messageListTag.appendChild(timeTag);
+
+            //messageTimeTag.appendChild(passageTag);
+            //messageTimeTag.appendChild(timeTag);
+
+            //messageListTag.appendChild(messageTimeTag);
+
+            document.querySelector('#chat-log').appendChild(messageListTag);
+            $(".messages, #chat-log").animate({ scrollTop: $(document).height() }, "fast");
+        }
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data['command'] === 'messages'){
+                for (let i=0; i < data['messages'].length; i++){
+                    createMessage(data['messages'][i]);
+                }
+            }else if(data['command'] === 'new_message'){
+                createMessage(data['message']);
+            }
+
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            if(messageInputDom.value === ''){
+                notifier.show('Error', 'Please enter message', '', '{% static 'notifier/img/high_priority-48.png' %}', 4000);
+            }else {
+
+                chatSocket.send(JSON.stringify({
+                    'command': 'new_message',
+                    'message': message,
+                    'from': username,
+                    'chatroom': roomName
+                }));
+
+                messageInputDom.value = '';
+                $(".messages").animate({ scrollTop: $(document).height() }, "fast");
+                $(document).ready(function() {
+                    $("button").click(function() {
+                        $(document).scrollTop($(document).height());
+                    });
+                });
+            }
+        };
+
+        messageInput.addEventListener('input', function () {
+            messageButton.disabled = (this.value === '');
+        })
+
+    </script>
+{% endblock %}

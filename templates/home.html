@@ -1,0 +1,60 @@
+{%  extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+{% load socialaccount %}
+{% load crispy_forms_tags %}
+{% load static i18n socialaccount %}
+{% providers_media_js %}
+{% include 'includes/navbar.html' %}
+
+    <div class="container mt-2" id="content">
+           <div class="row">
+                <div class="col-md-9 stories-section">
+                {% for post in all_posts %}
+                    <div class="px-2 py-2 mb-2 rounded lavender">
+
+                        {% if post.author.profile.image %}
+                            <img class="rounded-circle" style="width: 35px; height: 35px;" src="{{ post.author.profile.image.url }}" alt="">
+                        {% else %}
+                            <img class="rounded-circle" style="width: 35px; height: 35px;" src="{% static 'images/profile-avatar.jpg' %}" alt="">
+                        {% endif %}
+
+                        <span class="ml-2">{{ post.author|capfirst }}</span> <small class="text-success font-weight-bold"> <i class="fa fa-clock-o"></i> {{ post.created_on }}</small>
+                        <div class="ml-5">
+                            <h2 class="story-title"><a href="{{ post.get_absolute_url }}">{{ post.title|title }}</a></h2>
+                            {% for tag in post.tags.all %}
+                                <span class="badge badge-secondary"><a style="color: white; text-decoration: none;" href="{% url 'taggedstories' tag.slug %}">#{{ tag }}</a></span>
+                            {% endfor %}<br>
+                            <input type="hidden" id="post-id" value="{{ post.id }}">
+                            &#x2764; {{ post.likes }}
+                            <i class="ml-3"></i>&#128519; {{ post.smiles }}
+                            <i class="text-info fa fa-eye ml-3"></i> {{ post.views }}
+
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+                <div class="col-md-3 col-sm-3 mb-2 rounded lavender sidebar-portal" style="max-height: inherit;">
+                    {% if latest_stories %}
+                        <h4 class="text-center">Latest Stories</h4><hr>
+                        {% for latest in latest_stories %}
+                            <small><a href="{{ latest.get_absolute_url}}">{{ latest.title }}</a><hr></small>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="common-tags">
+                    {% if common_tags %}
+                        <h4 class="text-center">Common Tags</h4><hr>
+                        {% for common in common_tags %}
+                            <span class="badge badge-info ml-4"><a style="color: white;" href="{% url 'taggedstories' common.slug %}"># {{ common }}</a></span><br>
+                        {% endfor %}
+                    {% endif %}
+                    </div>
+                </div>
+           </div>
+    </div>
+{% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+
+{% endblock %}

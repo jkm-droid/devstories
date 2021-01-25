@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% include 'includes/navbar.html' %}
+      {% if user.is_authenticated %}
+          <div class="container mt-4" id="content">
+           <div class="">
+                <div class="container col-md-9 stories-section">
+                {% if all_posts %}
+                    <h3 class="text-info text-center">Your notifications</h3>
+                    {% for post in all_posts %}
+                        <div class="mb-2 rounded lavender">
+
+                            {% if post.author.profile.image %}
+                                <img class="rounded-circle" style="width: 35px; height: 35px;" src="{{ post.author.profile.image.url }}" alt="">
+                            {% else %}
+                                <img class="rounded-circle" style="width: 35px; height: 35px;" src="{% static 'images/profile-avatar.jpg' %}" alt="">
+                            {% endif %}
+
+                            <span class="ml-2">{{ post.author|capfirst }}</span> posted this story on <small class="text-success font-weight-bold"> <i class="fa fa-clock-o"></i> {{ post.created_on }}</small>
+                            <div class="ml-5">
+                                <h2 class="story-title"><a href="{{ post.get_absolute_url }}">{{ post.title|title }}</a></h2>
+                                {% for tag in post.tags.all %}
+                                    <span class="badge badge-secondary"><a style="color: white; text-decoration: none;" href="{% url 'taggedstories' tag.slug %}">#{{ tag }}</a></span>
+                                {% endfor %}<br>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% else %}
+                        <h3 class="text-center text-info">You no notifications</h3>
+                    {% endif %}
+                    </div>
+
+            </div>
+          </div>
+
+    {% endif %}
+{% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/darkmode.js' %}"></script>
+{% endblock %}

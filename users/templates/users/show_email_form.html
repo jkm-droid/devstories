@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+{% include 'includes/navbar.html' %}
+
+    <div class="col-md-4 col-sm-6 offset-md-4 login rounded">
+
+         <h4 class="text-center">Request Password Reset</h4>
+
+         {% if messages %}
+                 {% for msg in messages %}
+                     <div class="bg-warning rounded">
+                         <p class="text-center">{{ msg }}</p>
+                     </div>
+                 {% endfor %}
+         {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="InputEmail"><small class="text-danger">*</small>Enter the Email Address associated with your account</label>
+                <input type="text" class="form-control" id="InputEmail" name="email" placeholder="Enter Your Email Address"><br>
+
+                <input id="request-btn" disabled onclick="changeName()" type="submit" class="btn btn-success form-control" name="" value="Request Password Reset"><br>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block javascript %}
+    <script>
+    const email = document.getElementById('InputEmail');
+    const btn = document.getElementById('request-btn');
+
+    email.addEventListener("input", function () {
+        btn.disabled = (this.value === '');
+        btn.css('opacity', '1.5');
+    });
+
+    function changeName() {
+        document.getElementById("request-btn").value = "Emailing your the password reset link...Please wait"
+    }
+
+    </script>
+{% endblock %}

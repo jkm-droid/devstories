@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% load static %}
+    {% include 'includes/navbar.html' %}
+    <link rel="stylesheet" href="{% static 'css/chat-room-1.css' %}">
+    <div class="container mt-4 mb-4">
+
+        <div class="messaging">
+            <h3 class="text-center room-title"><span class="text-success online-message" id="display-users"></span>{{ room_title | capfirst }} chatroom</h3><hr class="chat-divider">
+            <div class="inbox_msg">
+                <!--<div class="inbox_people">
+                  <div class="headind_srch">
+                    <div class="recent_heading">
+                      <h4>Recent</h4>
+                    </div>
+                    <div class="srch_bar">
+                      <div class="stylish-input-group">
+                        <input type="text" class="search-bar"  placeholder="Search" >
+                        <span class="input-group-addon">
+                        <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                        </span> </div>
+                    </div>
+                  </div>
+                  <div class="inbox_chat">
+                    <div class="chat_list active_chat">
+                      <div class="chat_people">
+                        <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                        <div class="chat_ib">
+                          <h5>jkm droid <span class="chat_date">Dec 25</span></h5>
+                          <p>Test, which is a new approach to have all solutions
+                            astrology under one roof.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="chat_list">
+                      <div class="chat_people">
+                        <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                        <div class="chat_ib">
+                          <h5>jkm droid <span class="chat_date">Dec 25</span></h5>
+                          <p>Test, which is a new approach to have all solutions
+                            astrology under one roof.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>--->
+                <div class="mesgs">
+                    <div class="msg_history" id="chat-log">
+
+                        <div class="incoming_msg">
+
+                        </div>
+
+                        <div class="outgoing_msg">
+
+                        </div>
+
+                    </div>
+                    <div class="type_msg mb-2">
+                        <div class="input_msg_write">
+                            <input id="chat-message-input" type="text" class="write_msg" placeholder="Type your message here..." />
+                            <button disabled id="chat-message-submit" class="msg_send_btn" type="button"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div></div>
+    {{ room_name|json_script:"room-name" }}
+    {% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/chat.js' %}"></script>
+    <script src="{% static 'js/darkmode.js' %}"></script>
+    <script src="{% static 'js/reconnecting-websocket.js' %}"></script>
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const messageInput = document.getElementById('chat-message-input');
+        const messageButton = document.getElementById('chat-message-submit');
+        var username = {{ username }};
+
+        var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const chatSocket = new ReconnectingWebSocket(
+            ws_scheme
+            +'://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onopen = function(e){
+            fetchMessages();
+        };
+
+        function fetchMessages(){
+            chatSocket.send(JSON.stringify({'command': 'fetch_messages'}));
+        }
+
+        function createMessage(data){
+            const author = data['author'];
+            const timestamp = data.timestamp;
+
+            const messageListTag = document.createElement('div');
+            const imageTag = document.createElement('img');
+
+            const passageTag = document.createElement('p');
+            const timeTag = document.createElement('span');
+            timeTag.className = "time_date";
+
+            passageTag.textContent = data.content;
+            imageTag.src = '{% static 'images/profile-avatar.jpg' %}';
+            timeTag.textContent = timestamp;
+
+            //author is the sender, replying or sending message
+            //located on the right side
+            if(author === username){
+                //sent messages
+                messageListTag.className = 'outgoing_msg';
+                imageTag.className = "outgoing_msg_img";
+
+                const sentMessagesDiv = document.createElement('div');
+                sentMessagesDiv.className = "sent_msg";
+                sentMessagesDiv.appendChild(passageTag);
+                sentMessagesDiv.appendChild(timeTag);
+
+                messageListTag.appendChild(sentMessagesDiv);
+                //messageListTag.appendChild(imageTag);
+            }else{
+                //received messages
+                messageListTag.className = 'incoming_msg';
+                imageTag.className = "incoming_msg_img";
+
+                const receivedMessageDiv = document.createElement('div');
+                receivedMessageDiv.className = "received_msg";
+
+                const received_withd_msgDiv = document.createElement('div');
+                received_withd_msgDiv.className = "received_withd_msg";
+
+                const authorTag = document.createElement('span');
+                authorTag.textContent = author;
+                authorTag.style.color = "grey";
+
+                received_withd_msgDiv.appendChild(authorTag);
+                received_withd_msgDiv.appendChild(passageTag);
+                received_withd_msgDiv.appendChild(timeTag);
+                receivedMessageDiv.appendChild(received_withd_msgDiv);
+
+                messageListTag.appendChild(imageTag);
+                messageListTag.appendChild(receivedMessageDiv);
+            }
+
+            document.querySelector('#chat-log').appendChild(messageListTag);
+            $(".messages, #chat-log").animate({ scrollTop: $(document).height() }, "fast");
+        }
+
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log(data['command']);
+            if (data['command'] === 'messages'){
+                for (let i=0; i < data['messages'].length; i++){
+                    createMessage(data['messages'][i]);
+                }
+            }else if(data['command'] === 'new_message'){
+                createMessage(data['message']);
+            }
+
+
+            if(data['command'] === 'get_online_users'){
+                const users = data['no_of_users'];
+
+                function update_status() {
+                    const display = document.getElementById('display-users');
+                    display.textContent = "["+ users +"] developers online";
+
+                    //setTimeout(update_status, 5000);
+                    console.log(users);
+                }
+
+                update_status();
+
+            }
+
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            if(messageInputDom.value === ''){
+                notifier.show('Error', 'Please enter message', '', '{% static 'notifier/img/high_priority-48.png' %}', 4000);
+            }else {
+
+                chatSocket.send(JSON.stringify({
+                    'command': 'new_message',
+                    'message': message,
+                    'from': username,
+                    'chatroom': roomName
+                }));
+
+                messageInputDom.value = '';
+                $(".messages").animate({ scrollTop: $(document).height() }, "fast");
+                $(document).ready(function() {
+                    $("button").click(function() {
+                        $(document).scrollTop($(document).height());
+                    });
+                });
+            }
+        };
+
+        messageInput.addEventListener('input', function () {
+            messageButton.disabled = (this.value === '');
+        })
+
+    </script>
+{% endblock %}

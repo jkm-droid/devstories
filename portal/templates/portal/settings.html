@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% include 'includes/navbar.html' %}
+<div class="container mt-2">
+
+        <div class="col-md-8 offset-md-2" id="content lavender">
+        <!----update profile section----->
+            <h4 class="text-info">Edit Profile</h4><hr>
+            <form action="" method="post" enctype="multipart/form-data" class="settings-forms">
+                {% csrf_token %}
+                {{ edit_form|crispy }}
+                {{ user_form|crispy }}
+                <br>
+                <input type="submit" value="Change My Profile" class="btn btn-info form-control mb-4">
+            </form><hr>
+        
+        <!---change password section--->
+            <h4 class="text-info">Change Password</h4><hr>
+            <small id="message-success" class="text-info font-weight-bold"></small>
+            <small id="message-error" class="text-danger font-weight-bold"></small>
+            <form action="" method="post" id="form-change-password" class="settings-forms">
+                {% csrf_token %}
+                {{ pass_form|crispy }}
+                <br>
+                <input disabled type="submit" onclick="changeButtonPass();" id="change-password" value="Change Password" class="btn btn-info form-control mb-4">
+            </form><hr>
+        
+        <!----delete account section----->
+            <h4 class="text-info">Account settings</h4><hr>
+            <h5 class="text-danger">Danger Zone</h5>
+            <form action="{%  url 'deactivate' %}" method="post" class="settings-forms">
+                {% csrf_token %}
+                <small class="text-danger" id="error-message"></small>
+                <small class="delete-text">Are you sure you want to delete your account</small>
+                {% if request.user.is_authenticated %}"{{ user.username }}"{% endif %}<br>
+                <input onclick="changeButtonDel();" class="form-control mb-2 btn btn-danger btn-sm" type="submit"  value="Delete My Account" name="delete account"><br>
+            </form>
+        </div>
+</div>
+{% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/darkmode.js' %}"></script>
+
+    <script>
+    const old_password = document.getElementById('id_old_password');
+    const id_new_password1 = document.getElementById('id_new_password1');
+    const id_new_password2 = document.getElementById('id_new_password2');
+    const btn = document.getElementById('change-password');
+
+    old_password.addEventListener('input', function () {
+        id_new_password1.addEventListener('input', function () {
+            id_new_password2.addEventListener('input', function () {
+                btn.disabled = (this.value === '');
+            })
+        })
+    });
+    function changeButtonPass(){
+        document.getElementById("change-password").value = "Changing password...Please wait";
+    }
+
+    function changeButtonDel(){
+        document.getElementById("account-delete").value = "Deleting account...Please wait";
+    }
+    
+    //function to submit the change password form
+    $("#form-change-password").on('submit', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: "POST",
+            url:"",
+            data: {
+                old_password: $('#id_old_password').val(),
+                new_password1: $('#id_new_password1').val(),
+                new_password2: $('#id_new_password2').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dataType: "json",
+            },
+            
+            success: function (data) {
+                document.getElementById("form-change-password").reset();
+                document.getElementById("change-password").value = "Change Password";
+
+                if (data.success){
+
+                    notifier.show('Success', 'Password changed successfully', '', '{% static 'notifier/img/ok-48.png' %}', 4000);
+                }
+                if (data.error){
+
+                    notifier.show('Error', 'An error occurred...Please try again', '', '{% static 'notifier/img/high_priority-48.png' %}', 4000);
+                }
+            },
+            failure: function () {
+
+                notifier.show('Error', 'An error occurred...Please try again', '', '{% static 'notifier/img/high_priority-48.png' %}', 4000);
+            }
+        })
+    });
+    
+    $("#form-delete-account").on('submit', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: "POST",
+            url:"",
+            data: {
+                username: $('#username').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dataType: "json",
+            },
+
+            success: function (data) {
+                console.log(data);
+            },
+
+            failure: function () {
+                document.getElementById("error-message").value = "An error occurred";
+                console.log("something went wrong");
+            }
+
+        });
+    });
+
+    $(document).ready(function () {
+        $("button").click(function () {
+            $("#content").load("account.html");
+        });
+    });
+    </script>
+
+{% endblock %}

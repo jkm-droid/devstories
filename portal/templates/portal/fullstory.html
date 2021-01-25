@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+<div class="">
+    {% include 'includes/navbar.html' %}
+</div>
+
+        <div class="container mt-2">
+        <div class="row">
+
+        <!-----start section for showing the story together with image if present and other details related to the story----->
+        {% if story %}
+        <div class="container col-md-8 fullstory-border rounded lavender">
+            {% if story.image %}
+                <div class="card mt-2 img-rounded rounded">
+                    <img class="story-image" src="{{ story.image.url }}" alt="">
+                </div>
+            {% endif %}
+            <h3 class="mt-4 story-title">{{ story.title }}</h3>
+
+            {% if author.profile.image %}
+                <div class="text-info">
+                <img class="rounded-circle" style="height: 30px; width: 30px;" src="{{ author.profile.image.url }}" alt="">{{ story.author|capfirst }}
+                    <i class="font-weight-bold fa fa-clock-o"></i> {{ story.created_on }} Updated: {{ story.modified_on }} <small>10mins read</small>
+                {% if comments_no %}{{ comments_no }} Comment(s){% endif %}<br>
+                </div>
+            {% else %}
+                <img class="rounded-circle" style="height: 30px; width: 30px;" src="{% static 'images/profile-avatar.jpg' %}" alt="">
+                {{ story.author|capfirst }} {{ story.created_on }} <small>10mins read</small><br>
+            {% endif %}
+            <br>
+            <!-----showing tags related to story------>
+            <div class="ml-4">
+                {% for tag in story.tags.all %}
+                    <span class="badge badge-success"><a style="color: white;" href="{% url 'taggedstories' tag.slug %}">#{{ tag }}</a></span>
+                {% endfor %}
+            </div>
+            <p><br>{{ story.body|safe }}</p>
+
+        <!-----like, dislike, smile, desmile section----->
+            <div class="row text-center display-4 justify-content-center">
+
+                <form id="form-like" action="" method="post" >
+                    {% csrf_token %}
+                    <input id="like" class="like-smile" type="submit" value="&#x2764;" name="submit">
+                </form>
+
+                <form id="form-smile" action="" method="post">
+                    {% csrf_token %}
+                    <input id="smile" class="like-smile"  type="submit" name="submit" value="&#128519;">
+                </form>
+                <div class="text-success" id="output" style="font-size: large; position: absolute;">
+                </div>
+            </div>
+            <hr>
+
+        <!----section to add and show the comments related top the story-------->
+            <div class="">
+                <h3>Leave your comment</h3>
+                <div id="message" class="text-success"></div>
+                <form id="form-comment" action="" method="post">
+                    <small class="text-info">*Your username will be autofilled</small>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <br>
+                    <input type="submit" class="btn btn-info" value="Post Your Comment">
+                </form><br>
+
+                {% if comments %}
+                    {% for comment in comments %}
+                        {% if comment.username.profile.image %}
+                            <img class="rounded-circle" style="height: 30px; width: 30px;" src="{{ comment.username.profile.image.url }}" alt="">
+                            {{ comment.username|capfirst }} <i class="fa fa-clock-o"></i>{{ comment.created_on }}<br>
+                        {% else %}
+                            <img class="rounded-circle" style="height: 30px; width: 30px;" src="{% static 'images/profile-avatar.jpg' %}" alt="">
+                            {{ comment.username }} <i class="fa fa-clock-o"></i>{{ comment.created_on }}<br>
+                        {% endif %}
+
+                            <p class="container">{{ comment.body|safe }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+    <!---column to display the author's profile e.g. name, profile pic, level---->
+        <div class="col-md-3 rounded profile-column lavender">
+            {% if author.profile.image %}
+                <img class="rounded-circle" style="height: 50px; width: 50px;" src="{{ author.profile.image.url }}" alt="">{{ story.author|capfirst }}<br>
+            {% else %}
+                <img class="rounded-circle" style="height: 40px; width: 40px;" src="{% static 'images/profile-avatar.jpg' %}" alt="">{{ story.author }}<br>
+            {% endif %}
+
+            <div class="ml-4">
+                {% if author.profile.status == "PRO" %}
+                    <span class="badge badge-success">{{ author.profile.status }}</span>
+                {% elif author.profile.status == "INTERMEDIATE" %}
+                    <span class="badge badge-info">{{ author.profile.status }}</span>
+                {% else %}
+                    <span class="badge badge-secondary">{{ author.profile.status }}</span>
+                {% endif %}
+
+                {% if author.profile.description %}
+                    <p>{% if story.author == request.user %}<a class="text-info" data-toggle="tooltip" data-placement="left" title="Edit Status" href="{% url 'settings' %}">
+                        <i class="fa fa-edit"></i></a>{% endif %}{{ author.profile.description }}
+                    </p>
+                {% endif %}
+                <h5>Joined On</h5>
+                <p>{{ user.date_joined }}</p>
+            </div>
+
+        <!----more stories from the story's author----->
+         <div class="ml-4">
+            {% if more_stories %}
+                {% if title %}
+                    <hr><h6>{{ title|capfirst }}</h6><hr>
+                {% endif %}
+
+                {% for more in more_stories %}
+                    {% if more.slug != story.slug %}
+                       <a href="{{ more.get_absolute_url }}">{{ more.title|capfirst }}</a><br><hr>
+                    {% endif %}
+                {% endfor %}
+
+            {% endif %}
+         </div>
+        {% endif %}
+        </div>
+
+        </div>
+    </div>
+    {% include 'includes/footer.html' %}
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'js/darkmode.js' %}"></script>
+
+<script>
+function likeSmile(){
+    document.getElementById("like")
+}
+//function to submit comments without refreshing the page
+$('#form-comment').on('submit', function (e) {
+    e.preventDefault();
+    $.ajax({
+        type: "POST",
+        url: "",
+        data: {
+            body: $('#id_body').val(),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            dataType: "json",
+        },
+
+        success: function (data) {
+            document.getElementById("form-comment").reset();
+            notifier.show('Success', 'Comment Added Successfully', '', '{% static 'notifier/img/ok-48.png' %}', 4000);
+            //('#message').html(data.message);
+            setTimeout('refreshPage()', 3000);
+        }
+    });
+
+});
+
+function refreshPage(){
+    location.reload();
+}
+
+//function to submit data for registering story views
+$(document).ready(function () {
+
+    $.ajax({
+        type: "POST",
+        url: "/portal/{{ story.id }}/userviews/3",
+        data: {
+            story_id : {{ story.id }},
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            dataType: "json",
+        },
+
+        success: function (data) {
+            console.log(data.msg);
+        },
+
+        failure: function (data) {
+            console.log("something went wrong");
+        }
+    });
+
+});
+
+//function to submit likes
+$('#form-like').on('submit', function(e){
+
+e.preventDefault();
+  $.ajax({
+       type : "POST",
+       url: "/portal/{{ story.id }}/preference/1",
+       data: {
+        story_id : {{ story.id }},
+        userpreference : 1,
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        dataType: "json",
+
+       },
+
+       success: function(data){
+          if(data.message === "Liked"){
+              notifier.show('Success', 'Story Liked successfully', '', '{% static 'notifier/img/ok-48.png' %}', 4000);
+          }
+          if (data.message === "Unliked"){
+              notifier.show('Success', 'Story Unliked successfully', '', '{% static 'notifier/img/ok-48.png' %}', 4000);
+          }
+       }
+
+   });
+
+
+        });
+
+//function to submit smiles
+$('#form-smile').on('submit', function(e){
+
+e.preventDefault();
+  $.ajax({
+       type : "POST",
+       url: "/portal/{{ story.id }}/smile/2",
+       data: {
+        story_id : {{ story.id }},
+        userpreference : 2,
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        dataType: "json",
+
+       },
+
+       success: function(data){
+          if(data.message === "Smiled"){
+              notifier.show('Success', 'Smiley added successfully', '', '{% static 'notifier/img/ok-48.png' %}', 4000);
+          }
+          if(data.message === "Desmile"){
+              notifier.show('Success', 'Smiley Removed successfully', '', '{% static 'notifier/img/ok-48.png' %}', 4000);
+          }
+       }
+
+   });
+
+
+        });
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+{% include 'includes/navbar.html' %}
+    <div class="container mt-2">
+
+        <div class="container col-md-9">
+        {% if stories %}
+            <br>
+                <div class="bg-info">
+                    {% if tags %}
+                        <h1 class="text-center">#{{ tags.name }}</h1>
+                    {% endif %}
+
+                </div>
+            <br>
+        {% for story in stories %}
+
+            <div class="px-2 py-2 mb-2 rounded lavender">
+                {% if story.author.profile.image %}
+                    <img class="rounded-circle" style="width: 30px; height: 30px;" src="{{ story.author.profile.image.url }}" alt="">
+                {% else %}
+                    <img class="rounded-circle" style="width: 30px; height: 30px;" src="{% static 'images/profile-avatar.jpg' %}" alt="">
+                {% endif %}
+
+                {{ story.author|capfirst }} <small class="text-success font-weight-bold"> <i class="fa fa-clock-o"></i> {{ story.created_on }}</small>
+
+                <a style="text-decoration: none;" href="{{ story.get_absolute_url }}"><h4>{{ story.title }}</h4></a>
+                    <p>Published: {{ story.created_on }} Updated: {{ story.modified_on }}</p>
+                {% for tag in story.tags.all %}
+                    <span class="badge badge-secondary"><a style="color: white;" href="{% url 'taggedstories' tag.slug %}">#{{ tag }}</a></span>
+                {% endfor %}
+            </div>
+
+        {% endfor %}
+        {% endif %}
+        </div>
+    </div>
+{% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+<script src="{% static 'js/darkmode.js' %}"></script>
+
+{% endblock %}

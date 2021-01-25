@@ -1,0 +1,215 @@
+body{
+    background-color: aliceblue;
+}
+.register{
+    margin-top: 7%;
+    background-color: lavender;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border: 3px solid lavenderblush;
+}
+.login{
+    margin-top: 9%;
+    background-color: lavender;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border: 3px solid lavenderblush;
+}
+.dropdown-menu-right{
+    background-color: lavender;
+}
+.footer {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+#post-id{
+    display: none;
+}
+.lavender a{
+    text-decoration: none;
+}
+.lavender a:hover{
+    color: #17a2b8;
+}
+.href-link{
+    text-decoration: none;
+    color: #17a2b8;
+}
+.text-center a{
+    text-decoration: none;
+}
+.container .lavender{
+    background-color: lavender;
+}
+div .container a{
+    text-decoration: none;
+}
+div .col-md-3 a{
+    text-decoration: none;
+}
+
+div a{
+    text-decoration: none;
+}
+
+div .footer-links a {
+    text-decoration: none;
+}
+div .story-image{
+    max-height: 300px;
+}
+
+div .fullstory-border{
+    border: none;
+}
+
+.like-smile{
+    background-color: lavender;
+    border: none;
+}
+
+.save-button{
+    margin-left: 65%;
+}
+
+@media screen and (max-width: 480px) {
+    .register, .login{
+        background-color: lavender;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-bottom: 0;
+    }
+
+    div .profile-column{
+        display: none;
+    }
+
+    div .story-image{
+        max-height: 150px;
+    }
+
+    div .story-title{
+        font-size: x-large;
+    }
+    div h1, h2, h3, h4{
+        font-size: x-large;
+    }
+    div .fullstory-border{
+        border: none;
+    }
+
+    div .common-tags{
+        display: none;
+        height: 0;
+    }
+
+    div .save-button{
+        margin-left: 0;
+    }
+
+}
+
+@media screen and (min-width: 800px) {
+
+}
+.footer-unregistered {
+    background-color: lavender;
+}
+.navbar-unregistred{
+    background-color: lavender;
+    color: black;
+}
+
+.text-footer{
+    color: black;
+}
+.navbar-background{
+    background-color: lavender;
+}
+.footer-background{
+    background-color: lavender;
+}
+.navbar-background .navbar-brand{
+    color: black;
+}
+.chatroom a{
+    color: white;
+}
+.darkmode{
+
+     background-color: black;
+}
+.darkmode .lavender{
+    color: white;
+    background-color: #1a2634;
+}
+
+.darkmode .lavender a{
+    color: whitesmoke;
+}
+.darkmode .lavender a:hover{
+    color: #17a2b8;
+}
+
+.darkmode .writestory-title{
+    color: white;
+}
+
+.darkmode .dashboard-title{
+    color: white;
+}
+
+.darkmode .save-story{
+    background-color: #1a2634;
+    color: white;
+}
+
+.darkmode .delete-text{
+    color: white;
+}
+
+.darkmode .settings-forms .control-label {
+    color: white;
+}
+
+.darkmode .settings-forms .help-block{
+    color: white;
+}
+
+.darkmode .general-title{
+    color: white;
+}
+
+.darkmode .navbar-brand{
+    color: white;
+}
+
+.darkmode .navbar-background{
+    color: white;
+    background-color: #1a2634;
+}
+
+.darkmode .footer-background{
+    background-color: #1a2634;
+}
+
+.darkmode .text-footer{
+    color: white;
+}
+
+.darkmode .like-smile{
+    background-color: #1a2634;
+}
+
+.darkmode .dropdown-menu-right{
+    background-color: #1a2634;
+}
+
+.darkmode #frame{
+    background-color: #1a2634;
+}
+
+.darkmode .dropdown-item{
+        color: white;
+}

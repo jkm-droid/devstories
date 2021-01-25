@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+{% include 'includes/navbar.html' %}
+
+        <div class="col-md-8 offset-md-2">
+            <form action="" method="post">
+                {% csrf_token %}
+                {{ edit_form }}
+                {{ user_form }}
+            </form>
+        </div>
+</div>
+{% endblock %}

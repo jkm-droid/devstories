@@ -1,0 +1,7 @@
+<form action="" method="post">
+                {% csrf_token %}
+                {{ edit_form|crispy }}
+                {{ user_form|crispy }}
+                <br>
+                <input type="submit" value="CHANGE YOUR PROFILE" class="btn btn-info form-control">
+            </form>

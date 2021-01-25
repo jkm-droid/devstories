@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% include 'includes/navbar.html' %}
+      {% if user.is_authenticated %}
+        {% if messages %}
+            <div class="alert alert-success alert-dismissable text-center font-weight-bold">
+                {% for msg in messages %}
+                    {{ msg }}
+                {% endfor %}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
+
+          <div class="container mt-4" id="content">
+           <div class="row">
+                <div class="col-md-9 stories-section">
+                {% for post in all_posts %}
+                    <div class="px-2 py-2 mb-2 rounded lavender">
+
+                        {% if post.author.profile.image %}
+                            <img class="rounded-circle" style="width: 35px; height: 35px;" src="{{ post.author.profile.image.url }}" alt="">
+                        {% else %}
+                            <img class="rounded-circle" style="width: 35px; height: 35px;" src="{% static 'images/profile-avatar.jpg' %}" alt="">
+                        {% endif %}
+
+                        <span class="ml-2">{{ post.author|capfirst }}</span> <small class="text-success font-weight-bold"> <i class="fa fa-clock-o"></i> {{ post.created_on }}</small>
+                        <div class="ml-5">
+                            <h2 class="story-title"><a href="{{ post.get_absolute_url }}">{{ post.title|title }}</a></h2>
+                            {% for tag in post.tags.all %}
+                                <span class="badge badge-secondary"><a style="color: white; text-decoration: none;" href="{% url 'taggedstories' tag.slug %}">#{{ tag }}</a></span>
+                            {% endfor %}<br>
+                            <input type="hidden" id="post-id" value="{{ post.id }}">
+                            &#x2764; {{ post.likes }}
+                            <i class="ml-3"></i>&#128519; {{ post.smiles }}
+                            <i class="text-info fa fa-eye ml-3"></i> {{ post.views }}
+
+                        <!-----saving the stories a user likes for reading later------>
+                            <small class="output text-success" data-post-id="{{ post.id }}"></small>
+                            <button id="btn-save" type="submit" class="btn btn-sm btn-info save-button" data-item-id="{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Save">
+                                {% if post.is_saved == True %}Unsave{% else %}<i class="fa fa-save"></i> save{% endif %}
+                            </button>
+
+
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+                <div class="col-md-3 col-sm-3 mb-2 rounded lavender sidebar-portal" style="max-height: inherit;">
+                    {% if latest_stories %}
+                        <h4 class="text-center">Latest Stories</h4><hr>
+                        {% for latest in latest_stories %}
+                            <small><a href="{{ latest.get_absolute_url}}">{{ latest.title }}</a><hr></small>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="common-tags">
+                    {% if common_tags %}
+                        <h4 class="text-center">Common Tags</h4><hr>
+                        {% for common in common_tags %}
+                            <span class="badge badge-info ml-4"><a style="color: white;" href="{% url 'taggedstories' common.slug %}"># {{ common }}</a></span><br>
+                        {% endfor %}
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+          </div>
+
+    {% endif %}
+    {% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/darkmode.js' %}"></script>
+    <script>
+    //import notifier from 'notifier-js'
+    //show notification after saving a story
+    function showSavedNotification(){
+        //SlimNotifierJs.notification('info', 'Save Message', 'Story saved successfully', 3000);
+        notifier.show('Success', 'Story saved successfully', 'success', '{% static 'notifier/img/ok-48.png' %}', 4000);
+    }
+    //show notification after unsaving a story
+    function showUnsavedNotification(){
+        //SlimNotifierJs.notification('info', 'Save Message', 'Story unsaved successfully', 3000);
+        notifier.show('Success', 'Story unsaved successfully', '', '{% static 'notifier/img/ok-48.png' %}', 4000);
+    }
+
+    //function to fetch story status: whether a story is added into reading list or not
+    $('.save-button').hover(
+        function () {
+           const post_id = $(this).data('item-id');
+
+           $.ajax({
+               type: "POST",
+               url: "/portal/"+post_id+"/status/",
+               data: {
+                    story_id : post_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    dataType: "json"
+               },
+               success: function (data) {
+                   const msg = data.status;
+                   const unsavemsg = "unsave";
+                   const savemsg = "save";
+                   if(msg === "saved"){
+                       notifyUser(unsavemsg)
+                   }
+                   if(msg === "unsaved"){
+                       notifyUser(savemsg)
+                   }
+               }
+
+           });
+           function notifyUser(data) {
+
+           }
+        },
+        function () {
+            $(this).css('background-color', '');
+        }
+    );
+    //function to save or unsave a story
+    $(document).ready(function () {
+
+       $('.save-button').click(function() {
+           const post_id = $(this).data('item-id');
+           //console.log(post_id);
+
+        $.ajax({
+            type: "POST",
+            url: "/portal/"+post_id+"/save/7241996",
+            data: {
+                story_id : post_id,
+                usersave: 7241996,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                dataType: "json"
+            },
+
+            success: function (data) {
+                const story_id = data.postid;
+                //console.log(story_id);
+                if (data.message === "saved" && story_id === post_id){
+
+                    showSavedNotification()
+                }
+                if (data.message === "unsaved" && story_id === post_id){
+
+                    showUnsavedNotification()
+                }
+            },
+
+            failure: function () {
+                notifier.show('Error', 'An error occurred..Please retry', '', '{% static 'notifier/img/high_priority-48.png' %}', 4000);
+            }
+        });
+
+     });
+
+    });
+    </script>
+{% endblock %}

@@ -1,0 +1,29 @@
+<footer class="footer footer-unregistered {% if request.user.is_authenticated %} footer-background {% endif %} mt-2">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-4 text-md-left text-center {% if request.user.is_authenticated %} text-footer {% endif %}">
+                <h4><u>Developer Stories</u></h4>
+                <div class="footer-links">
+                    <a class="{% if request.user.is_authenticated %} text-footer {% endif %}" href="{% url 'portal' %}">Home</a><br>
+                    <a class="{% if request.user.is_authenticated %} text-footer {% endif %}" href="{% url 'dashboard' %}">Dashboard</a><br>
+                    <a class="{% if request.user.is_authenticated %} text-footer {% endif %}" href="{% url 'writestory' %}">WriteStory</a>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-left text-center {% if request.user.is_authenticated %} text-footer {% endif %}">
+                <h4><u>Contacts</u></h4>
+                <i class="fa fa-instagram"></i>
+                <i class="fa fa-facebook-square"></i>
+                <i class="fa fa-twitter-square"></i>
+                <i class="fa fa-google-plus-square"></i>
+            </div>
+            <div class="col-md-4 text-center {% if request.user.is_authenticated %} text-footer {% endif %}">
+                <h4><u>About US</u></h4>
+                Developer Stories is a platform for connecting all developers globally.
+                Making it easier for them to share their encounters and other stories
+            </div>
+        </div>
+        <br><div class="text-center {% if request.user.is_authenticated %} text-footer {% endif %}">@developerstories</div><br>
+
+    </div>
+</footer>

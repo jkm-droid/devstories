@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+{% include 'includes/navbar.html' %}
+
+    <div class="col-md-4 col-sm-6 offset-md-4 login rounded">
+
+         <h4 class="text-center">Sign in to Developer Stories</h4>
+
+         {% if messages %}
+                 {% for msg in messages %}
+                     <div class="bg-warning rounded">
+                         <p class="text-center">{{ msg }}</p>
+                     </div>
+                 {% endfor %}
+         {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="InputUsername">Username</label>
+                <input type="text" class="form-control" id="InputUsername" name="username" placeholder="Enter Username">
+            <label for="InputPassword">Password</label>
+                <input type="password" class="form-control" id="InputPassword" name="password" placeholder="Enter Password"><br>
+                <input id="login-btn" disabled onclick="changeName()" type="submit" class="btn btn-success form-control" name="" value="Login"><br>
+            <div class="text-center mt-2">
+                <a href="{% url 'register' %}">Don't have an account? Register</a>
+                <a href="{% url 'email' %}"> Forgot Password? Reset</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block javascript %}
+    <script>
+    const username = document.getElementById('InputUsername');
+    const password = document.getElementById('InputPassword');
+    const btn = document.getElementById('login-btn');
+
+    username.addEventListener('input', function () {
+        password.addEventListener('input', function () {
+            btn.disabled = (this.value === '');
+        });
+    });
+
+
+
+    function changeName() {
+        document.getElementById("login-btn").value = "Logging you in...Please wait"
+    }
+
+    </script>
+{% endblock %}

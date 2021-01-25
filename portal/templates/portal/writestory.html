@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+{% include 'includes/navbar.html' %}
+<div class="container mt-2">
+    <h5 class="text-center writestory-title">{{ title|capfirst }}</h5>
+
+    <div class="container col-md-10 justify-content-center lavender">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.media}}
+            {{ form| crispy }}
+
+            <div class="btn-group-lg justify-content-center">
+                <input type="submit" disabled id="publish-story-btn" class="btn btn-success form-control" value="PUBLISH YOUR STORY">
+            </div>
+        </form><br>
+    </div>
+</div>
+{% include 'includes/footer.html' %}
+{% endblock %}
+{% block javascript %}
+<script src="{% static 'js/darkmode.js' %}"></script>
+    <script>
+        function changeName() {
+            document.getElementById('publish-story-btn').value = "Publishing your story...Please wait"
+        }
+
+        const title = document.getElementById('id_title');
+        const body = document.getElementById('id_body');
+        const tags = document.getElementById('id_tags');
+        const btn = document.getElementById('publish-story-btn');
+
+        title.addEventListener('input', function () {
+            //body.addEventListener('input', function () {
+                tags.addEventListener('input', function () {
+                    btn.disabled = (this.value === '');
+                })
+            //})
+        });
+    </script>
+
+{% endblock %}

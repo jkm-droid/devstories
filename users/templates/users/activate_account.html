@@ -1,0 +1,12 @@
+{% autoescape off %}
+
+Hello {{user.username}}
+Please click the link below to confirm your account registration.
+Also, you can copy-and-paste the link in your browser tab.
+
+{{domain}}{% url 'activate' uidb64=uid token=token %}
+
+The link will expire within 30 minutes.
+
+
+{% endautoescape %}
