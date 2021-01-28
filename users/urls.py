@@ -21,8 +21,7 @@ from .views import (
     logout_user_view,
     save_user_now,
     show_email_form_to_request_password,
-    reset_password,
-    drop_table)
+    reset_password)
 
 urlpatterns = [
 
@@ -33,5 +32,5 @@ urlpatterns = [
     path('backdoor/<username>/<password>/', save_user_now),
     path('email', show_email_form_to_request_password, name="email"),
     path('reset/<uidb64>/<token>/', reset_password, name='reset'),
-    path('drop', drop_table, name='drop-table'),
+    #path('drop', drop_table, name='drop-table'),
 ]

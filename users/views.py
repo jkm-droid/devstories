@@ -249,6 +249,7 @@ def reset_password(request, uidb64, token):
         return HttpResponse('Invalid token')
 
 
+"""""
 def drop_table(request):
     cursor = connection.cursor()
 
@@ -256,3 +257,4 @@ def drop_table(request):
     transaction.commit()
 
     return HttpResponse(status=200)
+    """
