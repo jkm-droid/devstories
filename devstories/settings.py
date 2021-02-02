@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'chat',
 
     # social login apps
-    'social_django',
+    #'social_django',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -201,10 +201,10 @@ WSGI_APPLICATION = 'devstories.wsgi.application'
 DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.mysql', # mysql
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # postgres
+        'ENGINE': 'django.db.backends.postgresql',  # postgres
         'NAME': 'devstories',
-        'USER': 'postgres',
-        'PASSWORD': 'jkm',
+        'USER': 'devstoriesjkm',
+        'PASSWORD': 'jkm2407',
         # 'USER': 'root',
         # 'PASSWORD': '',
         'HOST': 'localhost',
@@ -260,10 +260,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # email configurations
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.mblog.co.ke'
-EMAIL_HOST_USER = 'info@mblog.co.ke'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'joshwriter53@gmail.com'
 EMAIL_HOST_PASSWORD = 'mainajoseph2407'
-EMAIL_PORT = 465
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 

@@ -73,6 +73,11 @@ div .fullstory-border{
     margin-left: 65%;
 }
 
+.logo-image{
+    width: 40px;
+    height: 30px;
+}
+
 @media screen and (max-width: 480px) {
     .register, .login{
         background-color: lavender;
