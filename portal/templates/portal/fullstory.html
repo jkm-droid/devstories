@@ -17,6 +17,10 @@
                 <div class="card mt-2 img-rounded rounded">
                     <img class="story-image" src="{{ story.image.url }}" alt="">
                 </div>
+            {% else %}
+                <div class="card mt-2 img-rounded rounded">
+                    <img class="story-image" src="{% static 'images/lake.jpg' %}" alt="">
+                </div>
             {% endif %}
             <h3 class="mt-4 story-title">{{ story.title }}</h3>
 

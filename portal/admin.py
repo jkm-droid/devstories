@@ -7,6 +7,7 @@ from .models import Story, UserProfile
 
 class CustomStory(admin.ModelAdmin):
     list_display = ('title', 'author', 'image_tag', 'likes', 'smiles', 'views', 'is_saved', 'draft', 'created_on')
+    # readonly_fields = ('status',)
 
 
 class CustomUserProfile(admin.ModelAdmin):

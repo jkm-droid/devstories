@@ -49,13 +49,14 @@ class EditProfileForm(UserChangeForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['status', 'image', 'description']
+        fields = ['image', 'description']
+        exclude = ['status']
 
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
 
-        self.fields['status'].widget.attrs['class'] = 'form-control'
-        self.fields['status'].help_text = '<small>Select one of the status. You can always change it in future</small>'
+        # self.fields['status'].widget.attrs['class'] = 'form-control' self.fields['status'].help_text =
+        # '<small>Select one of the status. You can always change it in future</small>'
 
         self.fields['image'].widget.attrs['class'] = 'form-control'
 

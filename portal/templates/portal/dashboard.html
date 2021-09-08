@@ -19,14 +19,14 @@
         <div class="container col-md-8 mt-2">
         {% if posts %}
             <br>
-            <div class="container">
+            <div class="">
             <div class="row">
-                <div class="container col-md-6 bg-info">
+                <div class="col-md-6 bg-info dash-posts-drafts">
                     <a href="{% url 'dashboard' %}"><h2 class="text-center text-secondary">
                         {% if number_of_posts %} {{ number_of_posts }} {% else %} 0 {% endif %} Post(s)</h2>
                     </a>
                 </div>
-                <div class="col-md-6 bg-warning">
+                <div class="col-md-6 bg-warning dash-posts-drafts">
                     <a href="{% url 'draftedstories' %}"><h2 class="text-center text-secondary">
                         {% if number_of_drafts %}{{ number_of_drafts }}{% else %} 0 {% endif %} Draft(s)</h2>
                     </a>
@@ -52,7 +52,7 @@
                 <div class="rounded-pill btn-group">
 
                     <a href="{{ post.get_edit_absolute_url }}"><button type="submit" class="btn btn-sm btn-warning mr-2"><i class="fa fa-edit"></i></button></a>
-                    <a href="{{ post.get_delete_absolute_url }}"><button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button></a>
+                    <a href="{{ post.get_delete_absolute_url }}"><button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button></a>
 
                 </div>
             </div>

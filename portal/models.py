@@ -1,3 +1,4 @@
+from PIL import Image
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -15,7 +16,7 @@ class UserProfile(models.Model):
         ("INTERMEDIATE", "Intermediate"),
         ("PRO", "Pro"),
     ]
-    status = models.CharField(max_length=20, choices=STATUS, default="BEGINNER")
+    status = models.CharField(max_length=20, choices=STATUS, default="BEGINNER" )
     is_online = models.BooleanField(default=False)
     image = models.ImageField(upload_to='images/', blank=True)
     description = models.TextField(blank=False, default="An interesting participator in Developer Stories")
@@ -83,9 +84,21 @@ class Story(models.Model):
         return f"/portal/delete/{self.slug}"
 
     def save(self, *args, **kwargs):
+        # take the stories title and
+        # convert it to slug
         new_title = f"{self.title}{self.pk}"
         self.slug = slugify(new_title)
+
         super(Story, self).save(*args, **kwargs)
+
+    def save_image(self, *args, **kwargs):
+        # resize the story cover image before saving
+        super().save()
+        img = Image.open(self.image.path)
+        if img.height > 300 or img.width > 300:
+            recommended_size = (300, 300)
+            img.resize(recommended_size)
+            img.save(self.image.path)
 
     def image_tag(self):
         if self.image:

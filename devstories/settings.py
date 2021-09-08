@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    # the system contains these apps
     'users',
     'portal',
     'crispy_forms',
@@ -46,7 +47,7 @@ INSTALLED_APPS = [
     'chat',
 
     # social login apps
-    #'social_django',
+    # 'social_django',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -98,8 +99,8 @@ CHANNEL_LAYERS = {
         # This app uses the Redis channel layer implementation asgi_redis
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],  # production
-            # "hosts": [("127.0.0.1", 6379)],  # development
+            # "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],  # production
+            "hosts": [("127.0.0.1", 6379)],  # development
         },
         # "ROUTING": "devstories.routing.channel_routing",
     },
@@ -152,24 +153,30 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+# change the site ids
 SITE_ID = 3  # production
 # SITE_ID = 4  # development
 
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'portal'
-
+''''
+configurations for social auth login/register to the system
+read the documentation of getting the auth keys from the respective
+social service provider
+you can still add more social auth apps
+'''
 # github
-SOCIAL_AUTH_GITHUB_KEY = 'd49a11b912682c19743c'
-SOCIAL_AUTH_GITHUB_SECRET = '72938f3a4d133985e3742b64e50b563eb35bb23b'
+SOCIAL_AUTH_GITHUB_KEY = ''
+SOCIAL_AUTH_GITHUB_SECRET = ''
 
-# github
-SOCIAL_AUTH_GOOGLE_KEY = '214076875015-f63hdb657qq4anr4bk2j6tl06mg7cs15.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_SECRET = 'FfoLZY9Fl-N2tXsf3rsnx3jx'
+# google
+SOCIAL_AUTH_GOOGLE_KEY = ''
+SOCIAL_AUTH_GOOGLE_SECRET = ''
 
 # facebook
-SOCIAL_AUTH_FACEBOOK_KEY = '601682300729165'  # App ID
-SOCIAL_AUTH_FACEBOOK_SECRET = '94865914dfe02dba97fa35de24ce9dd3'  # app key
+SOCIAL_AUTH_FACEBOOK_KEY = ''  # App ID
+SOCIAL_AUTH_FACEBOOK_SECRET = ''  # app key
 
 ROOT_URLCONF = 'devstories.urls'
 
@@ -197,16 +204,14 @@ WSGI_APPLICATION = 'devstories.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
+# add you database credentials, current supports mysql, postgresql, and sqllite
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.mysql', # mysql
-        'ENGINE': 'django.db.backends.postgresql',  # postgres
-        'NAME': 'devstories',
-        'USER': 'devstoriesjkm',
-        'PASSWORD': 'jkm2407',
-        # 'USER': 'root',
-        # 'PASSWORD': '',
+        'ENGINE': 'django.db.backends.mysql',  # mysql
+        # 'ENGINE': 'django.db.backends.postgresql',  # postgres
+        'NAME': 'YOUR_DATABASE_NAME',
+        'USER': 'YOUR_USERNAME',
+        'PASSWORD': 'YOUR_PASSWORD',
         'HOST': 'localhost',
         'PORT': '',
         # connect options
@@ -261,8 +266,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # email configurations
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'joshwriter53@gmail.com'
-EMAIL_HOST_PASSWORD = 'mainajoseph2407'
+EMAIL_HOST_USER = 'YOUR_USERNAME'
+EMAIL_HOST_PASSWORD = 'YOUR_PASSWORD'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False

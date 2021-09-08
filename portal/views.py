@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from taggit.models import Tag
 
 from portal.forms import WriteStoryForm, EditProfileForm, UserProfileForm, CommentForm, ChangePassword
-from .models import Story, Comments, Like, Smile, StoryViews, SaveForLater
+from .models import Story, Comments, Like, Smile, StoryViews, SaveForLater, UserProfile
 
 
 # function to get the number of added posts
@@ -345,6 +345,20 @@ def full_story_view(request, slug):
         author_id = story.author.id
         tags = Story.tags.all()
         author_user = User.objects.get(pk=author_id)
+
+        # get the number of stories the user has written
+        no_of_stories = Story.objects.filter(author=author_user).count()
+
+        if no_of_stories <= 1:
+            author_user.profile.status = "BEGINNER"
+            author_user.save()
+
+        elif 1 < no_of_stories <= 10:
+            author_user.profile.status = "INTERMEDIATE"
+            author_user.save()
+        else:
+            author_user.profile.status = "PRO"
+            author_user.save()
 
         # get more stories written by the author
         more_stories = Story.objects.filter(author=author_user)
